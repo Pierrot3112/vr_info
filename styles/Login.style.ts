@@ -19,6 +19,7 @@ interface Styles {
     btnQuitModal: ViewStyle;
     modal: ViewStyle;
     headModal: ViewStyle;
+    logo: ViewStyle;
 }
 
 const styles = StyleSheet.create({
@@ -31,7 +32,7 @@ const styles = StyleSheet.create({
     },
 
     head: {
-        height: '59%',
+        height: '70%',
         width: SIZES.width,
         marginTop: 0,
         marginBottom: 30,
@@ -39,6 +40,19 @@ const styles = StyleSheet.create({
         top: 25,
         objectFit: "cover",
         opacity: 0.85,
+    },
+
+    logo: {
+        height: SIZES.width/3,
+        width: SIZES.width/3,
+        marginTop: 0,
+        marginBottom: 30,
+        position: 'absolute',
+        top: SIZES.height/5,
+        right: 20,
+        objectFit: "cover",
+        opacity: 0.85,
+        borderRadius: 50
     },
 
     headContent: {
@@ -53,11 +67,11 @@ const styles = StyleSheet.create({
 
     title: {
         position: 'absolute',
-        top: '33.5%',
+        top:  SIZES.height/3,
         backgroundColor: COLORS.primary,
         paddingHorizontal: SIZES.medium * 3.5,
         paddingVertical: SIZES.medium,
-        borderRadius: SIZES.large
+        borderRadius: SIZES.large,zIndex: 1000
     },
 
     titleText: {

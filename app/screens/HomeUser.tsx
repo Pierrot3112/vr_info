@@ -19,7 +19,6 @@ const HomeUser = () => {
                 const response = await api.get('/users/segments'); 
                 setSegments(response.data); 
             } catch (error) {
-                console.error("❌ Erreur lors de la récupération des segments :", error);
                 setError("Erreur lors de la récupération des segments. Veuillez réessayer.");
             } finally {
                 setLoading(false); 

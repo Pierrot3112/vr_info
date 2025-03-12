@@ -80,16 +80,10 @@ const UpdateSegment: React.FC<UpdateSegmentProps> = ({ selectedSegment, onClose 
     
             if (response.status === 201) {
                 Alert.alert('Succès', 'Les données ont été enregistrées avec succès.');
-                console.log('✅ Données envoyées:');
-                console.log(connection_id);
-                console.log(longueur_embouteillage);
-                console.log(description);
-                onClose();
             } else {
                 Alert.alert('Erreur', 'Une erreur est survenue lors de l\'enregistrement.');
             }
         } catch (error: any) {
-            console.error('❌ Erreur lors de l\'enregistrement :', error.response?.data || error.message);
             Alert.alert('Erreur', `Détails: ${JSON.stringify(error.response?.data || error.message)}`);
         }
     };

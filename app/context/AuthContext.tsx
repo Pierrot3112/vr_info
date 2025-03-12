@@ -11,9 +11,11 @@ interface AuthState {
 
 interface AuthContextProps {
     authState: AuthState;
-    onLogin: (num_tel: string, password: string) => Promise<{ error?: boolean; msg?: string }>;
+    onLogin: (num_tel: string, password: string) => Promise<{ error?: boolean; msg?: string; token?: string }>;
     onLogout: () => void;
     checkToken: () => Promise<string | null>;
+    getRole: (token: string | null) => Promise<string>;
+    setAuthState: (authState: AuthState) => void; // Ajout de setAuthState
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -43,7 +45,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                     setAuthState({ token: null, authenticated: false });
                 }
             } catch (error) {
-                console.error("❌ Erreur lors du chargement du token :", error);
             }
         };
         loadToken();
@@ -55,11 +56,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const token = response.data.access_token;
 
             await AsyncStorage.setItem(TOKEN_KEY, token);
-
             setAuthState({ token, authenticated: true });
 
-            return { error: false, msg: "Connexion réussie" };
-        } catch (error) {
+            return { error: false, msg: "Connexion réussie", token }; // Retourne le token
+        } catch (error: any) {
             return { error: true, msg: error.response?.data?.msg || "Échec de la connexion" };
         }
     };
@@ -69,23 +69,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             await AsyncStorage.removeItem(TOKEN_KEY);
             setAuthState({ token: null, authenticated: false });
         } catch (error) {
-            console.error("❌ Erreur lors de la déconnexion :", error);
+        }
+    };
+
+    const getRole = async (token: string | null): Promise<string> => {
+        if (!token) throw new Error("Aucun token fourni");
+        try {
+            const response = await api.get("/me", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            return response.data.role; // Assurez-vous que la réponse contient la propriété "role"
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    const checkToken = async (): Promise<string | null> => {
+        try {
+            const token = await AsyncStorage.getItem(TOKEN_KEY);
+            return token;
+        } catch (error) {
+            return null;
         }
     };
 
     return (
-        <AuthContext.Provider value={{ authState, onLogin: login, onLogout: logout, checkToken }}>
+        <AuthContext.Provider value={{ authState, onLogin: login, onLogout: logout, checkToken, getRole, setAuthState }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-export const checkToken = async (): Promise<string | null> => {
-    try {
-        const token = await AsyncStorage.getItem(TOKEN_KEY);
-        return token;
-    } catch (error) {
-        console.error("❌ Erreur lors de la vérification du token :", error);
-        return null;
-    }
-};
+export default AuthContext;

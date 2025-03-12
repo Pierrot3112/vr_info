@@ -30,7 +30,6 @@ api.interceptors.request.use(
                 config.headers.Authorization = `Bearer ${token}`;
             }
         } catch (error) {
-            console.error("❌ Erreur lors de la récupération du token:", error);
         }
         return config;
     },
@@ -42,12 +41,11 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (axios.isCancel(error)) {
-            console.error("❌ Requête annulée:", error.message);
-            // Vous pouvez afficher une notification à l'utilisateur ici
+            
         } else if (error.response) {
-            console.error("❌ Erreur API:", error.response.data);
+            
         } else {
-            console.error("❌ Erreur réseau ou autre:", error.message);
+            
         }
         return Promise.reject(error);
     }

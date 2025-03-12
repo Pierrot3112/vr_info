@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { View, TextInput, TouchableOpacity, SafeAreaView, ImageBackground, Text, Alert, ActivityIndicator } from 'react-native';
+import React, { useState } from 'react';
+import { View, TextInput, TouchableOpacity, SafeAreaView, ImageBackground, Text, ActivityIndicator, KeyboardAvoidingView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from "@react-navigation/native";
@@ -7,13 +7,12 @@ import styles from '../../styles/Login.style';
 import useNetworkStatus from '../../components/NetworkStatus/NetworkStatus';
 import Toast from 'react-native-toast-message';
 
-
 const Login = () => {
     const [num_tel, setNumTel] = useState('');
     const [password, setPassword] = useState('');
     const [secureText, setSecureText] = useState(true);
     const [loading, setLoading] = useState(false);
-    const { onLogin } = useAuth();
+    const { onLogin, getRole } = useAuth(); // Ajout de getRole
     const navigation = useNavigation();
     const isOnline = useNetworkStatus();
 
@@ -23,32 +22,54 @@ const Login = () => {
         if (!num_tel || !password) {
             Toast.show({ 
                 type: 'error',
-                text1: 'Utilisateur inexistant ou mot de passe incorrect',
+                text1: 'Tous les champs sont obligatoires',
                 text2: 'Veuillez réesseyer!'
-            })
-            Alert.alert('Erreur', 'Tous les champs sont obligatoires');
+            });
             return;
         }
 
         setLoading(true);
         const result = await onLogin(num_tel, password);
-        setLoading(false);
 
         if (result?.error) {
-            Toast.show({ 
+            Alert.alert('Erreur de connexion', result.msg || 'Utilisateur inexistant ou mot de passe incorrect');
+            Toast.show({
                 type: 'error',
-                text1: 'Utilisateur inexistant ou mot de passe incorrect',
-                text2: 'Veuillez réesseyer!'
-            })
+                text1: 'Erreur de connexion',
+                text2: result.msg || 'Utilisateur inexistant ou mot de passe incorrect',
+            });
         } else {
-            navigation.navigate("Home"); 
+            try {
+                const role = await getRole(result.token); // Utilisez le token retourné par onLogin
+                if (role !== 'client') {
+                    navigation.navigate("Home"); // Redirigez vers Home si le rôle est 'users'
+                } else {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Accès refusé',
+                        text2: 'Vous n\'avez pas les permissions nécessaires.',
+                    });
+                }
+            } catch (error) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Erreur',
+                    text2: 'Une erreur est survenue lors de la vérification du rôle.',
+                });
+            }
         }
+
+        setLoading(false);
     };
 
     return (
         <SafeAreaView>
-            <View style={styles.container}>
+            <KeyboardAvoidingView style={styles.container}>
                 <ImageBackground source={require('../../assets/images/city.jpg')} style={styles.head} />
+                <ImageBackground source={require('../../assets/images/logoVoieRapide.jpeg')} style={styles.logo} />
+                <View style={styles.title}>
+                    <Text style={styles.titleText}>Authentification</Text>
+                </View>
                 <View style={styles.formLogin}>
                     <TextInput
                         style={styles.inputText}
@@ -75,7 +96,7 @@ const Login = () => {
                     
                     {loading && <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} />}
                 </View>
-            </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 };
