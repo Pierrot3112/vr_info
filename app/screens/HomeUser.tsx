@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import styles from '../../styles/home.style';
 import api from '../../config/AxioConfig'; 
@@ -52,11 +53,16 @@ const HomeUser = () => {
                             onPress={() => handleSegmentClick(segment)}
                             style={styles.segmentContainer}
                         >
-                            <View>
-                                <Text>Segment ID: {segment.segment_id}</Text>
-                                <Text>
-                                    {segment.point_depart_nom} ---{'>'} {segment.point_arrivee_nom}
-                                </Text>
+                            <View>  {/* Point de départ */}
+                                <Text style={styles.segmentId}>Numero: {segment.segment_id}</Text>
+                                <View style={styles.point}>
+                                    <Ionicons name="location-outline" size={18} color="green" />
+                                    <Text style={styles.textPont}>{segment.point_depart_nom}</Text>
+                                </View>
+                                <View style={styles.point}>
+                                    <Ionicons name="flag-outline" size={18} color="red" /> 
+                                    <Text style={styles.textPont}>{segment.point_arrivee_nom}</Text>
+                                </View>
                             </View>
                         </TouchableOpacity>
                     ))}

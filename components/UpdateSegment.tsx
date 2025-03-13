@@ -94,7 +94,6 @@ const UpdateSegment: React.FC<UpdateSegmentProps> = ({ selectedSegment, onClose 
             <View style={styles.modalContent}>
                 {selectedSegment && (
                     <>
-                        <Text>{selectedSegment.segment_id}</Text>
                         <View style={styles.modalTitle}>
                             <AnimatedText text={selectedSegment.point_depart_nom} />
                             <Ionicons name='arrow-forward-outline' size={24} />

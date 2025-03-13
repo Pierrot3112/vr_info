@@ -6,10 +6,10 @@ import { RouteProp } from '@react-navigation/native';
 import styles from '../../styles/splash.style';
 import { checkToken, getRole } from '../context/AuthContext';
 
-
 type RootStackParamList = {
     Splash: undefined;
     Login: undefined;
+    Home: undefined; // Ajoutez 'Home' aux paramètres de navigation
 };
 
 type SplashScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Splash'>;
@@ -34,29 +34,29 @@ const Splash: React.FC<SplashProps> = ({ navigation }) => {
         }, 4000);
 
         const timeout2 = setTimeout(() => {
-            navigation.replace('Login');
+            navigation.navigate('Login');
         }, 5000);
+
+        const checkAuth = async () => {
+            const token = await checkToken();
+            if (token) {
+                const role = await getRole(token);
+                if (role !== 'client') {
+                    navigation.navigate('Home'); 
+                } else {
+                    navigation.navigate('Login');
+                }
+            } else {
+                navigation.navigate('Login');
+            }
+        };
+
+        checkAuth();
 
         return () => {
             clearTimeout(timeout1);
             clearTimeout(timeout2);
         };
-
-        const checkAuth = async () => {
-            const token = await checkToken();
-            if (token) {
-              const role = await getRole(token);
-              if (role === 'client') {
-                navigation.navigate('HomeClient');
-              } else {
-                navigation.navigate('HomeUser');
-              }
-            } else {
-              navigation.navigate('Login');
-            }
-        };
-
-        checkAuth();
     }, [navigation]);
 
     const animatedText1Style = useAnimatedStyle(() => ({

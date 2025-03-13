@@ -42,8 +42,9 @@ const Login = () => {
             try {
                 const role = await getRole(result.token); // Utilisez le token retourné par onLogin
                 if (role !== 'client') {
-                    navigation.navigate("Home"); // Redirigez vers Home si le rôle est 'users'
+                    navigation.navigate('Home');
                 } else {
+                    Alert.alert('Vous n\'êtes pas un informateur!', 'Veuillez reconnecter');
                     Toast.show({
                         type: 'error',
                         text1: 'Accès refusé',

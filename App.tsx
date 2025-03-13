@@ -5,7 +5,6 @@ import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import { AuthProvider, useAuth } from './app/context/AuthContext';
 import Login from './app/screens/Login';
 import Splash from './app/screens/Splash';
-import Me from './components/Me';
 import Home from './app/screens/Home';
 
 const Stack = createNativeStackNavigator();
@@ -19,14 +18,14 @@ export default function App() {
 }
 
 export const Layout = () => {
-    const { authState, getRole, setAuthState, checkToken } = useAuth(); // Ajout de checkToken
+    const { authState, getRole, setAuthState, checkToken } = useAuth();
     const [isLoading, setIsLoading] = useState(true);
     const [userRole, setUserRole] = useState<string | null>(null);
 
     useEffect(() => {
         const loadTokenAndRole = async () => {
             try {
-                const token = await checkToken(); // Utilisez checkToken directement
+                const token = await checkToken();
                 if (token) {
                     const role = await getRole(token);
                     setUserRole(role);
@@ -62,13 +61,14 @@ export const Layout = () => {
             <NavigationContainer>
                 <Stack.Navigator screenOptions={{ headerShown: false }}>
                     {authState.authenticated ? (
-                        <Stack.Screen name="Login" component={Login} />
-                    ) : userRole !== 'client' ? (
-                         <Stack.Screen name='Home' component={Home} />
+                        userRole !== 'client' ? (
+                            <Stack.Screen name="Home" component={Home} /> // Affichez Home si l'utilisateur est authentifié et que son rôle n'est pas 'client'
+                        ) : (
+                            <Stack.Screen name="Login" component={Login} /> // Affichez Login si l'utilisateur est un client
+                        )
                     ) : (
-                        <Stack.Screen name="Login" component={Login} />
+                        <Stack.Screen name="Login" component={Login} /> // Affichez Login si l'utilisateur n'est pas authentifié
                     )}
-                   
                 </Stack.Navigator>
             </NavigationContainer>
         </PaperProvider>

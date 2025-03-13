@@ -7,6 +7,9 @@ interface Styles {
     headerText: TextStyle;
     scrollSegmentContainer: ViewStyle;
     segmentContainer: ViewStyle;
+    segmentId: TextStyle;
+    point: ViewStyle;
+    textPont: TextStyle;
 }
 
 const styles = StyleSheet.create({
@@ -29,18 +32,45 @@ const styles = StyleSheet.create({
     },
 
     scrollSegmentContainer: {
-        marginTop: 40,
+        marginTop: 10,
     },
 
     segmentContainer: {
-        height: SIZES.height/7,
+        height: SIZES.height/7.5,
         width: '100%',
         backgroundColor: COLORS.primary,
         borderRadius: 10,
-        padding: 20,
         marginBottom: 10,
+        paddingHorizontal: 20,
+        paddingVertical: 10
     },
 
+    segmentId:{
+        textAlign: 'center',
+        padding: 5,
+        marginTop: 0,
+        backgroundColor: COLORS.green,
+        marginBottom: 0,
+        marginLeft: 50,
+        width: 200,
+        borderRadius: 10,
+        color: COLORS.primary,
+        fontWeight: 'bold',
+        fontSize: 10,
+    },
+
+    point:{
+        marginTop: 6,
+        display: 'flex',
+        flexDirection: 'row',
+        gap: 20,
+        alignItems: 'center',
+
+    },
+
+    textPont: {
+        fontSize: 11,
+    },
 
     modalContainer: {
         flex: 1,
