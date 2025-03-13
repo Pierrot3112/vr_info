@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, SafeAreaView, TouchableOpacity, Modal } from 'react-native';
 import styles from '../../styles/home.style';
 import api from '../../config/AxioConfig'; 
 import UpdateSegment from '../../components/UpdateSegment';
 import { COLORS, SIZES } from '../../constants';
+import PullToRefresh from '../../components/PullToRefresh';
 
 const HomeUser = () => {
     const [segments, setSegments] = useState([]); 
@@ -13,26 +14,39 @@ const HomeUser = () => {
     const [loading, setLoading] = useState(true); 
     const [error, setError] = useState(null); 
 
-    // Récupérer les segments depuis l'API
-    useEffect(() => {
-        const fetchSegments = async () => {
-            try {
-                const response = await api.get('/users/segments'); 
-                setSegments(response.data); 
-            } catch (error) {
-                setError("Erreur lors de la récupération des segments. Veuillez réessayer.");
-            } finally {
-                setLoading(false); 
-            }
-        };
+    const fetchSegments = async () => {
+        try {
+            const response = await api.get('/users/segments'); 
+            const updatedSegments = response.data.map((segment) => {
+                const lastUpdate = new Date(segment.last_update);
+                const now = new Date();
+                
+                if (!isNaN(lastUpdate.getTime())) {
+                    const diffInMs = now.getTime() - lastUpdate.getTime();
+                    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
 
+                    return { ...segment, diffInMinutes };
+                }
+                
+                return { ...segment, diffInMinutes: null };
+            });
+
+            setSegments(updatedSegments);
+            setError(null);
+        } catch (error) {
+            setError("Erreur lors de la récupération des segments. Veuillez réessayer.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchSegments();
     }, []);
 
-    // Fonction pour gérer le clic sur un segment
     const handleSegmentClick = (segment) => {
-        setSelectedSegment(segment); 
-        setModalVisible(true); 
+        setSelectedSegment(segment);
+        setModalVisible(true);
     };
 
     return (
@@ -42,34 +56,46 @@ const HomeUser = () => {
             </View>
 
             {loading ? (
-                <Text style={{marginTop: SIZES.height/2, textAlign: 'center', color: COLORS.primary, }}>Chargement en cours ...</Text>
+                <Text style={{ marginTop: SIZES.height / 2, textAlign: 'center', color: COLORS.primary }}>
+                    Chargement en cours ...
+                </Text>
             ) : error ? (
                 <Text style={{ color: 'red', textAlign: 'center' }}>{error}</Text>
             ) : (
-                <ScrollView style={styles.scrollSegmentContainer}>
-                    {segments.map((segment) => (
-                        <TouchableOpacity
-                            key={segment.segment_id}
-                            onPress={() => handleSegmentClick(segment)}
-                            style={styles.segmentContainer}
-                        >
-                            <View>  {/* Point de départ */}
-                                <Text style={styles.segmentId}>Numero: {segment.segment_id}</Text>
-                                <View style={styles.point}>
-                                    <Ionicons name="location-outline" size={18} color="green" />
-                                    <Text style={styles.textPont}>{segment.point_depart_nom}</Text>
-                                </View>
-                                <View style={styles.point}>
-                                    <Ionicons name="flag-outline" size={18} color="red" /> 
-                                    <Text style={styles.textPont}>{segment.point_arrivee_nom}</Text>
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-                    ))}
-                </ScrollView>
+                <PullToRefresh onRefresh={fetchSegments}>
+                    <View style={styles.scrollSegmentContainer}>
+                        {segments.map((segment) => {
+                            const segmentStyle = segment.diffInMinutes !== null && segment.diffInMinutes >= 10
+                                ? [styles.segmentContainer, { borderWidth: 2, borderColor: 'red' }]
+                                : styles.segmentContainer;
+
+                            return (
+                                <TouchableOpacity
+                                    key={segment.segment_id}
+                                    onPress={() => handleSegmentClick(segment)}
+                                    style={segmentStyle}
+                                >
+                                    <View>
+                                        <Text style={styles.segmentId}>
+                                            Numero: {segment.segment_id} {"\n"}
+                                            {segment.last_update}
+                                        </Text>
+                                        <View style={styles.point}>
+                                            <Ionicons name="location-outline" size={18} color="green" />
+                                            <Text style={styles.textPont}>{segment.point_depart_nom}</Text>
+                                        </View>
+                                        <View style={styles.point}>
+                                            <Ionicons name="flag-outline" size={18} color="red" />
+                                            <Text style={styles.textPont}>{segment.point_arrivee_nom}</Text>
+                                        </View>
+                                    </View>
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </View>
+                </PullToRefresh>
             )}
 
-            {/* Modal pour afficher les détails du segment */}
             <Modal
                 animationType="slide"
                 transparent={true}

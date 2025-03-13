@@ -1,28 +1,61 @@
 import { COLORS, SIZES } from "../constants";
-import { StyleSheet, ViewStyle, TextStyle } from "react-native";
+import { StyleSheet, ViewStyle, TextStyle, ImageStyle } from "react-native";
 
 interface Style {
     home: ViewStyle;
     container: ViewStyle;
     text: TextStyle;
+    imageContainer: ViewStyle;
+    loaderContainer: ViewStyle;
+    loaderText: TextStyle;
+    logo: ImageStyle;
 }
 
 const styles = StyleSheet.create<Style>({
     home: {
-        height: SIZES.height,
-        width: SIZES.width,
-        backgroundColor: COLORS.secondary,
-        justifyContent: "center",
-        alignItems: "center",
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
     },
     container: {
-        alignItems: "center",
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        height: '100%',
     },
     text: {
-        fontSize: 24,
-        fontWeight: "bold",
-        color: "#fff",
-        marginVertical: 10,
+        fontSize: 30,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        color: '#000',
+    },
+    logo: {
+        width: 150,
+        height: 150,
+        resizeMode: 'contain',
+        marginBottom: 20,
+    },
+    imageContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20, 
+    },
+    loaderContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 20, 
+    },
+    loaderText: {
+        fontSize: 30,
+        fontWeight: 'bold',
+        color: '#000',
+        marginHorizontal: 5, 
+    },
+    animatedLoaderText: {
+        opacity: 0.5,
+        transform: [{ scale: 1.5 }],
     },
 });
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import { useAuth } from './AuthContext';
 import { useNavigation } from '@react-navigation/native';
-import { View, Text } from 'react-native';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -12,7 +11,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const navigation = useNavigation();
 
     if (!authState?.authenticated) {
-        navigation.navigate('Login' as never); // Navigue vers l'écran de connexion
+        navigation.navigate('Login' as never); 
         return null;
     }
 

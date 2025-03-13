@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, Animated, Easing } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Easing, ActivityIndicator } from 'react-native';
 import { COLORS, SIZES } from '../constants';
 import { Ionicons } from '@expo/vector-icons';
 import RNPickerSelect from 'react-native-picker-select';
 import { TextInput } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
 import api from '../config/AxioConfig';
 
 interface Segment {
@@ -18,13 +19,13 @@ interface UpdateSegmentProps {
 }
 
 const AnimatedText = ({ text }: { text: string }) => {
-    const translateX = useRef(new Animated.Value(100)).current; // Commence hors de l'écran
+    const translateX = useRef(new Animated.Value(100)).current; 
 
     useEffect(() => {
         Animated.loop(
             Animated.timing(translateX, {
-                toValue: -200, // Distance à parcourir (ajuste selon la largeur)
-                duration: 5000, // Vitesse de défilement
+                toValue: -200,
+                duration: 5000,
                 easing: Easing.linear,
                 useNativeDriver: true,
             })
@@ -43,6 +44,7 @@ const AnimatedText = ({ text }: { text: string }) => {
 const UpdateSegment: React.FC<UpdateSegmentProps> = ({ selectedSegment, onClose }) => {
     const [selectedValue, setSelectedValue] = useState('');
     const [description, setDescription] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const items = [
         { label: 'Moins de 50m', value: '50' },
@@ -54,40 +56,64 @@ const UpdateSegment: React.FC<UpdateSegmentProps> = ({ selectedSegment, onClose 
 
     const handleSave = async () => {
         if (!selectedSegment) {
-            Alert.alert('Erreur', 'Aucun segment sélectionné.');
+            Toast.show({
+                type: 'error',
+                text1: 'Erreur',
+                text2: 'Aucun segment sélectionné.',
+            });
             return;
         }
-    
+
         if (!selectedValue) {
-            Alert.alert('Erreur', 'Veuillez sélectionner une longueur d\'embouteillage.');
+            Toast.show({
+                type: 'error',
+                text1: 'Erreur',
+                text2: 'Veuillez sélectionner une longueur d\'embouteillage.',
+            });
             return;
         }
-    
-        if (!description) {  // Corrigé: utilisé "description" au lieu de "setDescription"
-            Alert.alert('Erreur', 'Veuillez ajouter une description.');
+
+        if (!description) {
+            Toast.show({
+                type: 'error',
+                text1: 'Erreur',
+                text2: 'Veuillez ajouter une description.',
+            });
             return;
         }
-        
-        const connection_id = selectedSegment.segment_id;
-        const longueur_embouteillage = parseInt(selectedValue, 10);
-        
+        setLoading(true);
+
         try {
             const response = await api.post('/informations', { 
-                connection_id,
-                longueur_embouteillage,
+                connection_id: selectedSegment.segment_id,
+                longueur_embouteillage: parseInt(selectedValue, 10),
                 description
             });
-    
+
             if (response.status === 201) {
-                Alert.alert('Succès', 'Les données ont été enregistrées avec succès.');
+                Toast.show({
+                    type: 'success',
+                    text1: 'Succès',
+                    text2: 'Les données ont été enregistrées avec succès.',
+                });
             } else {
-                Alert.alert('Erreur', 'Une erreur est survenue lors de l\'enregistrement.');
+                Toast.show({
+                    type: 'error',
+                    text1: 'Erreur',
+                    text2: 'Une erreur est survenue lors de l\'enregistrement.',
+                });
             }
         } catch (error: any) {
-            Alert.alert('Erreur', `Détails: ${JSON.stringify(error.response?.data || error.message)}`);
+            Toast.show({
+                type: 'error',
+                text1: 'Erreur',
+                text2: `Détails: ${JSON.stringify(error.response?.data || error.message)}`,
+            });
+        } finally {
+            setLoading(false);
         }
+
     };
-    
 
     return (
         <View style={styles.modalContainer}>
@@ -115,20 +141,24 @@ const UpdateSegment: React.FC<UpdateSegmentProps> = ({ selectedSegment, onClose 
                     </>
                 )}
 
-                <View style={styles.bottomBtn}>
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={onClose}
-                    >
-                        <Text style={styles.closeButtonText}>Fermer</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.saveButton}
-                        onPress={handleSave}
-                    >
-                        <Text style={styles.submitButtonText}>Enregistrer</Text>
-                    </TouchableOpacity>
-                </View>
+                {loading ? (
+                    <ActivityIndicator size="large" color="#0000ff" />
+                ) : (
+                    <View style={styles.bottomBtn}>
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={onClose}
+                        >
+                            <Text style={styles.closeButtonText}>Fermer</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.saveButton}
+                            onPress={handleSave}
+                        >
+                            <Text style={styles.submitButtonText}>Enregistrer</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             </View>
         </View>
     );
@@ -160,7 +190,7 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     textContainer: {
-        width: 120, // Ajuste la largeur selon tes besoins
+        width: 120,
         overflow: 'hidden',
     },
     animatedText: {

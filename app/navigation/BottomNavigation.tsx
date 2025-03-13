@@ -5,7 +5,7 @@ import { COLORS } from '../../constants';
 import { useAuth } from '../context/AuthContext';
 import HomeUser from '../screens/HomeUser';
 import Login from '../screens/Login';
-import ProtectedRoute from '../context/ProtectedRoute'; // Importez le composant ProtectedRoute
+import ProtectedRoute from '../context/ProtectedRoute'; 
 import { Text, TouchableOpacity } from 'react-native';
 
 const Tab = createBottomTabNavigator();
@@ -14,7 +14,7 @@ const BottomTabNavigation = () => {
     const { onLogout } = useAuth();
 
     const handleLogout = () => {
-        onLogout(); // Supprime le token et met à jour l'état d'authentification
+        onLogout(); 
     };
 
     return (
@@ -54,7 +54,7 @@ const BottomTabNavigation = () => {
 
             <Tab.Screen
                 name="Quitter"
-                component={Login} // Redirige vers l'écran de connexion après la déconnexion
+                component={Login} 
                 options={{
                     tabBarIcon: ({ focused }) => (
                         <Ionicons
@@ -65,7 +65,7 @@ const BottomTabNavigation = () => {
                     ),
                     tabBarButton: (props) => (
                         <TouchableOpacity
-                            onPress={handleLogout} // Déclenche la déconnexion
+                            onPress={handleLogout} 
                             style={{
                                 flex: 1,
                                 justifyContent: 'center',

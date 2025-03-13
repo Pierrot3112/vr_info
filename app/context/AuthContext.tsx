@@ -12,10 +12,10 @@ interface AuthState {
 interface AuthContextProps {
     authState: AuthState;
     onLogin: (num_tel: string, password: string) => Promise<{ error?: boolean; msg?: string; token?: string }>;
-    onLogout: () => void;
+    onLogout: () => Promise<void>;
     checkToken: () => Promise<string | null>;
-    getRole: (token: string | null) => Promise<string>;
-    setAuthState: (authState: AuthState) => void; // Ajout de setAuthState
+    getRole: (token: string) => Promise<string>;
+    setAuthState: (authState: AuthState) => void;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -35,17 +35,14 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [authState, setAuthState] = useState<AuthState>({ token: null, authenticated: false });
 
+    const checkToken = async (): Promise<string | null> => {
+        return await AsyncStorage.getItem(TOKEN_KEY);
+    };
+
     useEffect(() => {
         const loadToken = async () => {
-            try {
-                const token = await checkToken();
-                if (token) {
-                    setAuthState({ token, authenticated: true });
-                } else {
-                    setAuthState({ token: null, authenticated: false });
-                }
-            } catch (error) {
-            }
+            const token = await checkToken();
+            setAuthState({ token, authenticated: !!token });
         };
         loadToken();
     }, []);
@@ -58,38 +55,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             await AsyncStorage.setItem(TOKEN_KEY, token);
             setAuthState({ token, authenticated: true });
 
-            return { error: false, msg: "Connexion réussie", token }; // Retourne le token
+            return { error: false, msg: "Connexion réussie", token };
         } catch (error: any) {
+            console.error("Erreur lors de la connexion :", error);
             return { error: true, msg: error.response?.data?.msg || "Échec de la connexion" };
         }
     };
 
     const logout = async () => {
-        try {
-            await AsyncStorage.removeItem(TOKEN_KEY);
-            setAuthState({ token: null, authenticated: false });
-        } catch (error) {
-        }
+        await AsyncStorage.removeItem(TOKEN_KEY);
+        setAuthState({ token: null, authenticated: false });
     };
 
-    const getRole = async (token: string | null): Promise<string> => {
-        if (!token) throw new Error("Aucun token fourni");
+    const getRole = async (token: string): Promise<string> => {
         try {
             const response = await api.get("/me", {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            return response.data.role; // Assurez-vous que la réponse contient la propriété "role"
+            return response.data.role;
         } catch (error) {
-            throw error;
-        }
-    };
-
-    const checkToken = async (): Promise<string | null> => {
-        try {
-            const token = await AsyncStorage.getItem(TOKEN_KEY);
-            return token;
-        } catch (error) {
-            return null;
+            console.error("Erreur lors de la récupération du rôle :", error);
+            throw new Error("Impossible de récupérer le rôle");
         }
     };
 
