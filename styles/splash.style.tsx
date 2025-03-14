@@ -16,7 +16,7 @@ const styles = StyleSheet.create<Style>({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#fff',
+        backgroundColor: COLORS.bgBlue,
     },
     container: {
         justifyContent: 'center',
@@ -28,7 +28,7 @@ const styles = StyleSheet.create<Style>({
         fontSize: 30,
         fontWeight: 'bold',
         textAlign: 'center',
-        color: '#000',
+        color: COLORS.primary,
     },
     logo: {
         width: 150,
@@ -50,7 +50,7 @@ const styles = StyleSheet.create<Style>({
     loaderText: {
         fontSize: 30,
         fontWeight: 'bold',
-        color: '#000',
+        color: COLORS.gray2,
         marginHorizontal: 5, 
     },
     animatedLoaderText: {

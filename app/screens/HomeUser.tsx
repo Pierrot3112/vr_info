@@ -2,32 +2,48 @@ import React, { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Text, SafeAreaView, TouchableOpacity, Modal } from 'react-native';
 import styles from '../../styles/home.style';
-import api from '../../config/AxioConfig'; 
+import api from '../../config/AxioConfig';
 import UpdateSegment from '../../components/UpdateSegment';
 import { COLORS, SIZES } from '../../constants';
 import PullToRefresh from '../../components/PullToRefresh';
 
+const formatTimeDifference = (diffInMinutes) => {
+    if (diffInMinutes === null || isNaN(diffInMinutes)) {
+        return "N/A";
+    }
+
+    if (diffInMinutes < 1) {
+        const diffInSeconds = Math.floor(diffInMinutes * 60);
+        return `${diffInSeconds} seconde${diffInSeconds > 1 ? 's' : ''}`;
+    } else if (diffInMinutes < 60) {
+        return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''}`;
+    } else {
+        const diffInHours = Math.floor(diffInMinutes / 60);
+        return `${diffInHours} heure${diffInHours > 1 ? 's' : ''}`;
+    }
+};
+
 const HomeUser = () => {
-    const [segments, setSegments] = useState([]); 
-    const [selectedSegment, setSelectedSegment] = useState(null); 
-    const [modalVisible, setModalVisible] = useState(false); 
-    const [loading, setLoading] = useState(true); 
-    const [error, setError] = useState(null); 
+    const [segments, setSegments] = useState([]);
+    const [selectedSegment, setSelectedSegment] = useState(null);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const fetchSegments = async () => {
         try {
-            const response = await api.get('/users/segments'); 
+            const response = await api.get('/users/segments');
             const updatedSegments = response.data.map((segment) => {
                 const lastUpdate = new Date(segment.last_update);
                 const now = new Date();
-                
+
                 if (!isNaN(lastUpdate.getTime())) {
                     const diffInMs = now.getTime() - lastUpdate.getTime();
                     const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
 
                     return { ...segment, diffInMinutes };
                 }
-                
+
                 return { ...segment, diffInMinutes: null };
             });
 
@@ -78,7 +94,7 @@ const HomeUser = () => {
                                     <View>
                                         <Text style={styles.segmentId}>
                                             Numero: {segment.segment_id} {"\n"}
-                                            {segment.last_update}
+                                            Dernière mise à jour: {formatTimeDifference(segment.diffInMinutes)}
                                         </Text>
                                         <View style={styles.point}>
                                             <Ionicons name="location-outline" size={18} color="green" />

@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     },
 
     segmentContainer: {
-        height: SIZES.height/7.5,
+        height: SIZES.height/7,
         width: '100%',
         backgroundColor: COLORS.primary,
         borderRadius: 10,

@@ -22,7 +22,7 @@ interface SplashProps {
 const Splash: React.FC<SplashProps> = ({ navigation }) => {
     const text1Position = useSharedValue(-200);
     const text2Position = useSharedValue(200);
-    const loaderOpacity = useSharedValue(0);  // Opacité des points du loader
+    const loaderOpacity = useSharedValue(0);  
 
     useEffect(() => {
         text1Position.value = withTiming(0, { duration: 1000 });

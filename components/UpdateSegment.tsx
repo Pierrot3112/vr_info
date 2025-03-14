@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated, Easing, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Easing, ActivityIndicator, Alert } from 'react-native';
 import { COLORS, SIZES } from '../constants';
 import { Ionicons } from '@expo/vector-icons';
 import RNPickerSelect from 'react-native-picker-select';
@@ -56,29 +56,17 @@ const UpdateSegment: React.FC<UpdateSegmentProps> = ({ selectedSegment, onClose 
 
     const handleSave = async () => {
         if (!selectedSegment) {
-            Toast.show({
-                type: 'error',
-                text1: 'Erreur',
-                text2: 'Aucun segment sélectionné.',
-            });
+            Alert.alert('Infos', 'Aucun segment sélectionné.');
             return;
         }
 
         if (!selectedValue) {
-            Toast.show({
-                type: 'error',
-                text1: 'Erreur',
-                text2: 'Veuillez sélectionner une longueur d\'embouteillage.',
-            });
+            Alert.alert('Infos', 'Veuillez sélectionner une longueur d\'embouteillage.');
             return;
         }
 
         if (!description) {
-            Toast.show({
-                type: 'error',
-                text1: 'Erreur',
-                text2: 'Veuillez ajouter une description.',
-            });
+            Alert.alert('Infos', 'Veuillez ajouter une description.');
             return;
         }
         setLoading(true);
@@ -91,24 +79,12 @@ const UpdateSegment: React.FC<UpdateSegmentProps> = ({ selectedSegment, onClose 
             });
 
             if (response.status === 201) {
-                Toast.show({
-                    type: 'success',
-                    text1: 'Succès',
-                    text2: 'Les données ont été enregistrées avec succès.',
-                });
+                Alert.alert('Succès', 'Les données ont été enregistrées avec succès.');
             } else {
-                Toast.show({
-                    type: 'error',
-                    text1: 'Erreur',
-                    text2: 'Une erreur est survenue lors de l\'enregistrement.',
-                });
+                Alert.alert('Infos', 'Erreur de l\'enregistrement.');
             }
         } catch (error: any) {
-            Toast.show({
-                type: 'error',
-                text1: 'Erreur',
-                text2: `Détails: ${JSON.stringify(error.response?.data || error.message)}`,
-            });
+            Alert.alert('Infos', 'Segment invalid');
         } finally {
             setLoading(false);
         }

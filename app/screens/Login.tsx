@@ -72,40 +72,42 @@ const Login = () => {
 
     return (
         <PullToRefresh onRefresh={handleRefresh}>
-            <SafeAreaView>
-                <KeyboardAvoidingView style={styles.container}>
-                    <ImageBackground source={require('../../assets/images/city.jpg')} style={styles.head} />
-                    <ImageBackground source={require('../../assets/images/logoVoieRapide.jpeg')} style={styles.logo} />
-                    <View style={styles.title}>
-                        <Text style={styles.titleText}>Authentification</Text>
+           
+           <View style={styles.container}>
+                <ImageBackground source={require('../../assets/images/city.jpg')} style={styles.head}>
+                    <View style={styles.headContent}></View>
+                </ImageBackground>
+                <View style={styles.formLogin}>
+                    <View style={styles.loginTitle}>
+                        <Text style={styles.textLog1}>Bienvenue!!!</Text>
+                        <Text style={styles.textLog2}>Authentification</Text>
+                        <ImageBackground source={require('../../assets/images/logoVoieRapide.png')} style={styles.logo} />
                     </View>
-                    <View style={styles.formLogin}>
+                    <TextInput
+                        style={styles.inputText}
+                        placeholder="Numéro de téléphone"
+                        onChangeText={setNumTel}
+                        value={num_tel}
+                        keyboardType="phone-pad"
+                    />
+                    <View style={styles.inputPassword}>
                         <TextInput
-                            style={styles.inputText}
-                            placeholder="Numéro de téléphone"
-                            onChangeText={setNumTel}
-                            value={num_tel}
-                            keyboardType="phone-pad"
+                            style={styles.input}
+                            placeholder="Mot de passe"
+                            secureTextEntry={secureText}
+                            onChangeText={setPassword}
+                            value={password}
                         />
-                        <View style={styles.inputPassword}>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Mot de passe"
-                                secureTextEntry={secureText}
-                                onChangeText={setPassword}
-                                value={password}
-                            />
-                            <TouchableOpacity onPress={togglePasswordVisibility}>
-                                <Ionicons name={secureText ? "eye-outline" : "eye-off-outline"} size={24} color="gray" style={styles.icon} />
-                            </TouchableOpacity>
-                        </View>
-                        <TouchableOpacity style={styles.btnSubmit} onPress={login} disabled={loading}>
-                            <Text style={styles.btnSubmitText}>Se Connecter</Text>
+                        <TouchableOpacity onPress={togglePasswordVisibility}>
+                            <Ionicons name={secureText ? "eye-outline" : "eye-off-outline"} size={24} color="gray" style={styles.icon} />
                         </TouchableOpacity>
-                        {loading && <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} />}
                     </View>
-                </KeyboardAvoidingView>
-            </SafeAreaView>
+                    <TouchableOpacity style={styles.btnSubmit} onPress={login} disabled={loading}>
+                        <Text style={styles.btnSubmitText}>Se Connecter</Text>
+                    </TouchableOpacity>
+                    {loading && <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} />}
+                </View>
+            </View>
         </PullToRefresh>
     );
 };

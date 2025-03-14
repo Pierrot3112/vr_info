@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "vr_info",
-    "slug": "MyProject",
+    "name": "vr-info",
+    "slug": "vr-info",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.pierrot3112.VrInfo"
+      "bundleIdentifier": "com.pierrot3112.Vr-info"
     },
     "android": {
       "adaptiveIcon": {
@@ -28,8 +28,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "a270e0eb-5964-425d-8131-1391febc3019"
+        "projectId": "2378ac4f-ea88-4c04-988e-9fabdbcf6c48"
       }
-    }
+    },
+    "owner": "pierrot3112"
   }
 }
